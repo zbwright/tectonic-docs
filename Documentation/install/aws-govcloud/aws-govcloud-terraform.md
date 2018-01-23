@@ -1,3 +1,8 @@
+<br>
+<div class="alert alert-info" role="alert">
+    <i class="fa fa-exclamation-triangle"></i><b> Note:</b> This documentation is for an alpha feature. To register for the Tectonic on AWS GovCloud Alpha program, email <a href="mailto:tectonic-alpha-feedback@coreos.com">tectonic-alpha-feedback@coreos.com</a>.
+</div>
+
 # Install Tectonic on AWS GovCloud with Terraform
 
 Use this guide to manually install a Tectonic cluster on an [AWS GovCloud][govcloud-account] account.
