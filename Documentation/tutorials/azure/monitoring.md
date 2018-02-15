@@ -204,7 +204,7 @@ $ kubectl scale deployment/simple-deployment --replicas 2
 deployment "simple-deployment" scaled
 ```
 
-> url differs
+> URL differs
 
 By default, Prometheus scrapes the `kube-state-metrics` every 30 seconds. After scaling the deployment, wait 30 seconds, then refresh [prometheus.ingress.example.com/alerts][prom-ingress] to see that the alert is now firing, as the `simple-deployment` has fewer than 3 replicas.
 
