@@ -128,6 +128,8 @@ data:
 
 Next, create a means to access the Prometheus UI. Copy the following into a file named `prometheus-service.yaml`:
 
+  > these differ for Sandbox and Azure - beth
+
 ```yaml
 apiVersion: v1
 kind: Service
@@ -146,6 +148,9 @@ spec:
 ```
 
 Finally, create `Ingress` to enable access to Prometheus from outside the cluster. Copy the following into a file named `prometheus-ingress.yaml`:
+
+  > these differ for Sandbox and Azure - beth
+
 
 ```yaml
 apiVersion: extensions/v1beta1
@@ -186,6 +191,8 @@ prometheus "hello" created
 
 Now, with the Prometheus instance online, and configured to alert based on the number of replicas of the app, access the Prometheus UI to watch the configured alerts fire.
 
+> URL differs (of course)
+
 Use the URL provided by `Ingress` to access the Prometheus Alerts console: [prometheus.ingress.example.com/alerts][prom-ingress].
 
 ## Triggering an alert
@@ -196,6 +203,8 @@ The alert configured in Prometheus will fire if the `replicas` for the `simple-d
 $ kubectl scale deployment/simple-deployment --replicas 2
 deployment "simple-deployment" scaled
 ```
+
+> url differs
 
 By default, Prometheus scrapes the `kube-state-metrics` every 30 seconds. After scaling the deployment, wait 30 seconds, then refresh [prometheus.ingress.example.com/alerts][prom-ingress] to see that the alert is now firing, as the `simple-deployment` has fewer than 3 replicas.
 
