@@ -1,0 +1,319 @@
+Bare Metal: Installation
+------------------------
+
+This guide walks through a bare metal installation of Tectonic utilizing
+PXE-based tools. This document will cover:
+
+[width="100%",cols="32%,68%",options="header",]
+|=======================================================================
+|Step |Description
+|link:#1-overview[1. Node and networking requirements] |Review types of
+machines in the clusterReview networking requirements
+
+|link:#2-provisioning-infrastructure[2. Provision Infrastructure]
+|Download and install matchboxGenerate TLS assets
+
+|link:#3-networking[3. Configure Networking] |Set up DHCP, TFTP, and DNS
+servicesConfigure DNS for the cluster
+
+|link:#4-tectonic-installer[4. Tectonic Installer] |Install Kubernetes
+and Tectonic
+
+|link:#5-tectonic-console[5. Tectonic Console] |You’re done! Your
+cluster is ready!
+|=======================================================================
+
+For a more complete list of hardware and networking requirements, please
+see the bare metal link:requirements.md[requirements document].
+
+Overview video
+~~~~~~~~~~~~~~
+
+This overview video helps understand the big picture before beginning
+the deployment steps:
+
+1.  Node and networking requirements
++
+
+Node types
+^^^^^^^^^^
+
+A minimum of 3 machines are required to run Tectonic.
+
+* *Provisioner node* runs the matchbox network boot and provisioning
+service, along with PXE services (if not running elsewhere). You may use
+Container Linux or any Linux distribution for this node. It provisions
+nodes, but does not join Tectonic clusters.
+* *Controller nodes* run `etcd` and the control plane of the Tectonic
+cluster.
+* *Worker nodes* run your applications in Tectonic clusters. New worker
+nodes join the cluster by talking to controller nodes for admission.
+
+For more information, see link:requirements.md[bare metal installation
+requirements].
+
+Networking requirements
+^^^^^^^^^^^^^^^^^^^^^^^
+
+This guide requires familiarity with PXE booting, the ability to
+configure network services, and to add DNS names. Networking
+requirements include:
+
+* *matchbox* installation with gRPC API enabled and TLS client
+credentials.
+* *CoreOS Container Linux* images installed and available in the
+Matchbox cache.
+* *PXE enabled network* boot environment with DHCP, TFTP, and DNS
+services.
+
+Installation and setup of these three items is detailed below.
+
+1.  Provision Infrastructure
++
+
+Download and configure matchbox
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Matchbox is an open source service for on-premise environments that
+matches bare metal machines to profiles in order to PXE boot Container
+Linux clusters and automate cluster provisioning. Matchbox provides an
+authenticated API for clients like Tectonic Installer and Terraform.
+Profiles will define the kernel, initrd, iPXE config, and Container
+Linux config each node should use.
+
+Download a Matchbox v0.6+
+https://github.com/coreos/matchbox/releases[release].
+
+[source,sh]
+----
+$ wget https://github.com/coreos/matchbox/releases/download/v0.6.1/matchbox-v0.6.1-linux-amd64.tar.gz
+$ wget https://github.com/coreos/matchbox/releases/download/v0.6.1/matchbox-v0.6.1-linux-amd64.tar.gz.asc
+----
+
+Untar the release.
+
+[source,sh]
+----
+$ tar xzvf matchbox-v0.6.1-linux-amd64.tar.gz
+$ cd matchbox-v0.6.1-linux-amd64
+----
+
+https://github.com/coreos/matchbox/blob/master/Documentation/deployment.md[Install
+Matchbox] on a server or Kubernetes cluster that your bare metal
+machines can reach using the guides:
+
+* Installing on
+https://github.com/coreos/matchbox/blob/master/Documentation/deployment.md#coreos[Container
+Linux]
+* Installing on
+https://github.com/coreos/matchbox/blob/master/Documentation/deployment.md#rpm-based-distro[RPM-based]
+distros
+* Installing on generic
+https://github.com/coreos/matchbox/blob/master/Documentation/deployment.md#generic-linux[Linux]
+* Installing on
+https://github.com/coreos/matchbox/blob/master/Documentation/deployment.md#kubernetes[Kubernetes]
+* Running with
+https://github.com/coreos/matchbox/blob/master/Documentation/deployment.md#rkt[rkt]
+or
+https://github.com/coreos/matchbox/blob/master/Documentation/deployment.md#docker[docker]
+
+Be sure to enable the gRPC API and use the TLS generation script to
+create server and client certificates. This can be done following the
+``Customization'' and ``Generate TLS'' sections. Save the `ca.crt`,
+`client.crt`, and `client.key` on your local machine (e.g.
+`~/.matchbox`).
+
+https://github.com/coreos/matchbox/blob/master/Documentation/deployment.md#verify[Verify]
+the Matchbox service is running.
+
+Download CoreOS Container Linux
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Matchbox can serve CoreOS Container Linux images to reduce bandwidth
+usage and increase the speed of CoreOS Container Linux PXE boots and
+installs to disk. Tectonic Installer detects the highest version number
+available in the Matchbox cache.
+
+Download a recent CoreOS Container Linux stable
+https://coreos.com/releases/[release] with signatures.
+
+[source,sh]
+----
+$ ./scripts/get-coreos stable 1465.8.0 .     # note the "." 3rd argument
+----
+
+Move the images to `/var/lib/matchbox/assets`,
+
+[source,sh]
+----
+$ sudo cp -r coreos /var/lib/matchbox/assets
+----
+
+....
+$ tree /var/lib/matchbox/assets
+/var/lib/matchbox/assets/
+├── coreos
+│   └── 1465.8.0
+│       ├── CoreOS_Image_Signing_Key.asc
+│       ├── coreos_production_image.bin.bz2
+│       ├── coreos_production_image.bin.bz2.sig
+│       ├── coreos_production_pxe_image.cpio.gz
+│       ├── coreos_production_pxe_image.cpio.gz.sig
+│       ├── coreos_production_pxe.vmlinuz
+│       └── coreos_production_pxe.vmlinuz.sig
+....
+
+and verify the images are accessible.
+
+....
+$ curl http://matchbox.example.com:8080/assets/coreos/1465.8.0/
+<pre>...
+....
+
+1.  Configure Networking
++
+
+A bare metal Tectonic cluster requires PXE infrastructure.
+
+PXE-enabled network
+^^^^^^^^^^^^^^^^^^^
+
+Tectonic works with many on-premise network setups. Matchbox does not
+seek to be the DHCP server, TFTP server, or DNS server for the network.
+Instead, it serves iPXE scripts as the entrypoint for provisioning
+network booted machines. At a high level, the goals are to:
+
+* Chainload PXE firmwares to iPXE
+* Point iPXE client machines to the Matchbox iPXE endpoint (e.g.
+`http://matchbox.example.com:8080/boot.ipxe`)
+
+In the simplest case, an iPXE-enabled network can chain to Matchbox,
+
+....
+# /var/www/html/ipxe/default.ipxe
+chain http://matchbox.foo:8080/boot.ipxe
+....
+
+Read
+https://github.com/coreos/matchbox/blob/master/Documentation/network-setup.md[network-setup]
+for the complete range of options. Network admins have a great amount of
+flexibility. They may choose to:
+
+* Keep using existing DHCP, TFTP, and DNS services
+* Configure subnets, architectures, or specific machines to delegate to
+matchbox
+* Place matchbox behind a menu entry (timeout and default to matchbox)
+
+If you’ve never set up a PXE-enabled network before, check out the
+https://quay.io/repository/coreos/dnsmasq[quay.io/coreos/dnsmasq]
+container image
+https://github.com/coreos/matchbox/blob/master/Documentation/network-setup.md#coreosdnsmasq[copy-paste
+examples] and see the section about
+https://github.com/coreos/matchbox/blob/master/Documentation/network-setup.md#proxy-dhcp[proxy-DHCP].
+
+DNS
+^^^
+
+Tectonic Installer will prompt for _Controller_ and _Tectonic_ DNS
+names.
+
+Controller DNS
+++++++++++++++
+
+For the controller DNS name, add a record which resolves to the node you
+plan to use as a controller.
+
+Tectonic DNS
+++++++++++++
+
+By default, Tectonic Ingress runs as a
+http://kubernetes.io/docs/admin/daemons/[Kubernetes Daemon Set] across
+all worker nodes. For the Tectonic DNS name, add a record resolving to
+any nodes you plan to use as workers. Tectonic Console will be
+accessible at this DNS name. Choosing a Tectonic DNS type depends on the
+available infrastructure. Provide either a single DNS entry, round-robin
+DNS records, or the name of a load balancer fronting the workers on
+ports 80 and 443.
+
+For example:
+
+* `matchbox.example.com` resolves to your `matchbox` deployment
+* `controllers.example.com` resolves to any controller node
+* `tectonic.example.com` resolves to any worker nodes
+
+Providing a single entry for Tectonic DNS implies the Console will be
+inaccessible if that node fails. For higher availability, use a load
+balancer over several worker nodes.
+link:troubleshooting.md#domain-name-cant-be-changed[Changes to the
+Tectonic and Controller DNS configuration are not supported] after
+installation.
+
+1.  Tectonic Installer
++
+
+Make sure a current version of either the Google Chrome or Mozilla
+Firefox web browser is set as the default browser on the workstation
+where Installer will run.
+
+Download
+https://releases.tectonic.com/releases/tectonic_1.8.9-tectonic.1.zip[Tectonic
+Installer].
+
+[source,sh]
+----
+wget https://releases.tectonic.com/releases/tectonic_1.8.9-tectonic.1.zip
+unzip tectonic_1.8.9-tectonic.1.zip
+cd tectonic_1.8.9-tectonic.1/tectonic-installer
+----
+
+Run the Tectonic Installer for your platform:
+
+For macOS users:
+
+[source,bash]
+----
+$ ./tectonic-installer/darwin/installer
+----
+
+For Linux users:
+
+....
+$ ./tectonic-installer/linux/installer
+....
+
+For Windows users, link:../installer-windows.md[see this guide].
+
+A browser window will open to begin the GUI installation process, which
+will require the following information: * DNS: Domain names assigned for
+the master and worker nodes, which must exist before launching Tectonic
+Installer. * CoreOS License and Pull Secret: Available from
+account.coreos.com when logged in to the CoreOS account associated with
+this installation. * Matchbox endpoints: The HTTPS and API addresses for
+your matchbox endpoints. * Matchbox credentials: The `client.crt`,
+`client.key`, and `ca.crt` generated when installing Matchbox. * Machine
+MAC addresses: The MAC address for the machines on which the cluster
+will be built. The MAC address plus the DNS tell Matchbox (the
+provisioner node) what image to serve the machines (worker and master
+nodes). * SSH public key: The public key for the machine on which
+Tectonic Installer is running.
+
+....
+<img src="../../img/installer-bare-metal.png">
+<div class="co-m-screenshot-caption">Selecting a platform in Tectonic Installer</div>
+....
+
+Click _Submit_ to launch Terraform apply, then power on your machines
+via IPMI or by pressing the power button. Matchbox will configure your
+machine, load Container Linux, and allow cluster creation to begin.
+
+1.  Tectonic Console
++
+
+After the installer is complete, you’ll have a Tectonic cluster and be
+able to access Tectonic Console. You are ready to deploy your first
+application on to the cluster!
+
+....
+<img src="../../img/walkthrough/nginx-deploy-pods.png">
+<div class="co-m-screenshot-caption">Viewing pods in Tectonic Console</div>
+....

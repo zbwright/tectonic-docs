@@ -1,0 +1,125 @@
+AWS: Installation
+-----------------
+
+Preparation
+~~~~~~~~~~~
+
+Check the link:requirements.md[requirements doc] to see what’s needed.
+The short version:
+
+* a CoreOS account
+* an IAM account
+* an link:requirements.md#ssh-key[associated SSH key]
+* a domain or subdomain with
+https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/creating-migrating.html[DNS
+name service at AWS Route53].
+* Tectonic will create a new AWS Virtual Private Cloud (VPC), or you can
+select an existing VPC. To use an existing VPC, see the
+link:requirements.md#using-an-existing-vpc[existing VPC requirements].
+
+Create a CoreOS account
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Tectonic Installer requires the License and Pull Secret provided with a
+CoreOS account. To obtain this information and up to 10 free nodes,
+create a CoreOS account.
+
+1.  Go to https://account.coreos.com/login, and click _Sign Up_.
+2.  Check your inbox for a confirmation email. Click through to accept
+the terms of the license, activate your account, and be redirected to
+the _Account Overview_ page.
+3.  Click ``Free for use up to 10 nodes'' under Tectonic. Enter your
+contact information, and click _Get License for 10 nodes_.
+
+Once the update has processed, the _Overview_ window will refresh to
+include links to download the License and Pull Secret.
+
+Download and run Tectonic Installer
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Make sure a current version of either Google Chrome or Mozilla Firefox
+is set as the default browser on the workstation where Installer will
+run.
+
+Download the
+https://releases.tectonic.com/releases/tectonic_1.8.9-tectonic.1.zip[Tectonic
+installer].
+
+[source,bash]
+----
+wget https://releases.tectonic.com/releases/tectonic_1.8.9-tectonic.1.zip
+unzip tectonic_1.8.9-tectonic.1.zip
+cd tectonic_1.8.9-tectonic.1
+----
+
+Run the Tectonic Installer for your platform.
+
+For macOS users:
+
+[source,bash]
+----
+$ ./tectonic-installer/darwin/installer
+----
+
+For Linux users:
+
+....
+$ ./tectonic-installer/linux/installer
+....
+
+For Windows users, see link:../installer-windows.md[Running Tectonic
+Installer in a Docker container on Windows].
+
+A browser window will open to begin the GUI installation process.
+
+....
+<img src="../../img/installer-aws.png">
+<div class="co-m-screenshot-caption">Selecting a platform in Tectonic Installer</div>
+....
+
+Install Tectonic
+~~~~~~~~~~~~~~~~
+
+Be sure to read the link:requirements.md[installation requirements],
+which include a section on link:requirements.md#privileges[privileges
+for your AWS credentials], as well as the
+link:../../troubleshooting/faq.md[known issues section in the
+Troubleshooting guide] before you install.
+
+Installation requires the CoreOS License and Pull Secret described in
+link:#create-a-coreos-account[Create a CoreOS account] above. Be certain
+to create an account and enable the 10 free nodes before launching
+Tectonic Installer.
+
+Follow the on-screen instructions to provision your cluster. This
+process should take about 10-15 minutes.
+
+When prompted, click _Download assets_ to save all assets generated
+during the Tectonic Installer process. These assets include
+configuration files that will allow you to repeat your cluster set up
+manually, and the
+https://www.terraform.io/docs/state/[terraform.tfstate] file, which is
+required to delete your cluster, when desired.
+
+Once complete click _Go to my Tectonic Console_ to launch the Console,
+and begin interacting with your cluster.
+
+If you encounter any errors check the
+link:../../troubleshooting/faq.md[troubleshooting] documentation.
+
+Use Tectonic Console
+~~~~~~~~~~~~~~~~~~~~
+
+....
+<img src="../../img/walkthrough/nginx-deploy-pods.png">
+<div class="co-m-screenshot-caption">Viewing deployment pods in Tectonic Console</div>
+....
+
+Now you are ready to access Tectonic Console, configure `kubectl`, and
+deploy your first application to the cluster. A `kubeconfig` with the
+appropriate configuration for `kubectl` is available for download in the
+Tectonic Console.
+
+For those new to Tectonic and Kubernetes, the
+link:../../tutorials/index.md[Tectonic Tutorials] provide walk through
+instructions on getting started.

@@ -1,0 +1,43 @@
+Creating a CoreOS account
+-------------------------
+
+Creating a CoreOS account activates a License for up to 10 free nodes on
+a Tectonic cluster.
+
+First, go to https://account.coreos.com/login to sign up for a CoreOS
+account.
+
+A confirmation email will be sent to the listed account. Check your
+inbox for an email from CoreOS Support, and click _Verify Email_.
+
+Log in to complete registration and access the account _Overview_ page,
+which lists available CoreOS products.
+
+....
+<a href="../img/coreos-account-new.png" class="co-m-screenshot">
+  <img src="../img/coreos-account-new.png" class="img-responsive">
+</a>
+....
+
+Click _Free for use up to 10 nodes_ below Tectonic, enter your contact
+information, and click _Get License for 10 nodes_ to complete the
+registration process. Once complete, the _Overview_ page will list
+active subscriptions, and provide access to your CoreOS License and Pull
+Secret.
+
+....
+<a href="../img/coreos-account-overview.png" class="co-m-screenshot">
+  <img src="../img/coreos-account-overview.png" class="img-responsive">
+</a>
+....
+
+CoreOS License and Pull Secret
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The _CoreOS License_ and _Pull Secret_ are required to install Tectonic
+and access container images for CoreOS products.
+
+To obtain these files, https://account.coreos.com/login[log in] to your
+CoreOS account, and click the buttons to _Download CoreOS License_ and
+_Download Pull Secret_. Then, provide them when requested during the
+installation process.

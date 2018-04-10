@@ -1,0 +1,100 @@
+Managing your CoreOS account
+----------------------------
+
+Creating a CoreOS account provides up to 10 free nodes on a Tectonic
+cluster.
+
+Use the account management interface to review and update your CoreOS
+accounts and subscriptions.
+
+Once created, https://account.coreos.com/login[log in to your CoreOS
+account] to: * review and update account account number and contact
+information * review and update subscription plans * obtain CoreOS
+License and Pull Secret * add new users to the account * review billing
+information or update payment method * change account context
+
+Review account information
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Click the _Account_ tab to view your CoreOS account number, and review
+or edit your contact information.
+
+Review subscription plans
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Use the _Overview_ tab to review the history of your subscriptions,
+including activation date and status. Click _Update my Plan_ to obtain
+contact information for subscription changes.
+
+Obtain CoreOS License and Pull Secret
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Use the _Overview_ tab to copy or download your License and Pull Secret.
+This information is required to install Tectonic.
+
+Add users to a CoreOS account
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Use the _Account_ tab to invite new users to an account, and manage
+existing user subscriptions. Users must be added to an account before
+they can deploy CoreOS software from the account.
+
+To invite new users to the account, click _Invite New User_. Email
+invitations will be sent, from which new users may activate their
+account.
+
+To accept the invitation, users must first create a CoreOS account by
+clicking the _Register_ link at the bottom of the login box and
+completing email validation.
+
+....
+<a href="../img/coreos-account-invited-email.png" class="co-m-screenshot">
+  <img src="../img/coreos-account-invited-email.png" class="img-responsive">
+</a>
+....
+
+Once added, users will see the organization name to the left of their
+account name at the top of their _Overview_ page. Their status on the
+_Account_ page will change from _Invited_ to _Accepted_.
+
+To edit a user’s access rights, click the sprocket to the left of their
+email address.
+
+....
+<a href="../img/coreos-account-user-invited.png" class="co-m-screenshot">
+  <img src="../img/coreos-account-user-invited.png" class="img-responsive">
+</a>
+....
+
+Select _Change Role_ to assign Read Only or Admin rights to the user.
+Select _Revoke Access_ to remove the user from the cluster.
+
+Review and update billing information
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Use the _Billing_ tab to view billing information, or to change the
+account’s payment method or billing address.
+
+....
+<a href="../img/billingpage.png" class="co-m-screenshot">
+  <img src="../img/billingpage.png" class="img-responsive">
+</a>
+....
+
+Change account context
+~~~~~~~~~~~~~~~~~~~~~~
+
+A user may be a member of several CoreOS accounts. For example, they may
+have a Quay Enterprise license through work and access to a trial
+Tectonic cluster through a personal account. In this case, users must
+switch account contexts to access each license separately.
+
+To switch contexts, click the email address in the upper right corner of
+the page, and select an account to load the _Overview_ page for that
+context.
+
+....
+<a href="../img/coreos-account-overview.png" class="co-m-screenshot">
+  <img src="../img/coreos-account-overview.png" class="img-responsive">
+</a>
+....
