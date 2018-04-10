@@ -1,0 +1,17 @@
+Developer Guides
+----------------
+
+Most users will never have to build Container Linux from source or
+modify it in any way. If you have a need to modify Container Linux, we
+provide an SDK that allows you to build your own developer images. We
+also provide OEM functionality for cloud providers and other companies
+that must customize Container Linux to run within their environment.
+
+* link:sdk-modifying-coreos.md[Modifying Container Linux]
+* link:sdk-building-development-images.md[Building development images]
+* link:sdk-building-production-images.md[Building production images]
+* link:kernel-modules.md[Building custom kernel modules]
+* link:sdk-tips-and-tricks.md[SDK tips and tricks]
+* link:sdk-disk-partitions.md[Disk layout]
+* https://github.com/coreos/mantle/blob/master/README.md#kola[Kola
+integration testing framework]

@@ -1,0 +1,111 @@
+Running CoreOS Container Linux on Microsoft Azure
+-------------------------------------------------
+
+Choosing a channel
+~~~~~~~~~~~~~~~~~~
+
+Container Linux is designed to be
+https://coreos.com/why/#updates[updated automatically] with different
+schedules per channel. This feature can be
+link:update-strategies.md[disabled], although it is not recommended. The
+https://coreos.com/releases[release notes] contain information about
+specific features and bug fixes.
+
+The following command will create a single instance. For more details,
+check out link:#via-the-microsoft-azure-cli[Launching via the Microsoft
+Azure CLI].
+
+Stable Channel
+
+Beta Channel
+
+Alpha Channel
+
+....
+<div class="tab-pane" id="alpha">
+  <div class="channel-info">
+    <p>The Alpha channel closely tracks master and is released frequently. The newest versions of system libraries and utilities will be available for testing. The current version is Container Linux {{site.alpha-channel}}.</p>
+    <pre>az vm create --name node-1 --resource-group group-1 --admin-username core --custom-data "$(cat config.ign)" --image CoreOS:CoreOS:Alpha:latest</pre>
+  </div>
+</div>
+<div class="tab-pane" id="beta">
+  <div class="channel-info">
+    <p>The Beta channel consists of promoted Alpha releases. The current version is Container Linux {{site.beta-channel}}.</p>
+    <pre>az vm create --name node-1 --resource-group group-1 --admin-username core --custom-data "$(cat config.ign)" --image CoreOS:CoreOS:Beta:latest</pre>
+  </div>
+</div>
+<div class="tab-pane active" id="stable">
+  <div class="channel-info">
+    <p>The Stable channel should be used by production clusters. Versions of Container Linux are battle-tested within the Beta and Alpha channels before being promoted. The current version is Container Linux {{site.stable-channel}}.</p>
+    <pre>az vm create --name node-1 --resource-group group-1 --admin-username core --custom-data "$(cat config.ign)" --image CoreOS:CoreOS:Stable:latest</pre>
+  </div>
+</div>
+....
+
+Container Linux Config
+~~~~~~~~~~~~~~~~~~~~~~
+
+Container Linux allows you to configure machine parameters, configure
+networking, launch systemd units on startup, and more via a Container
+Linux Config. Head over to the link:provisioning.md[docs to learn how to
+use Container Linux Configs]. Note that Microsoft Azure doesn’t allow an
+instance’s userdata to be modified after the instance has been launched.
+This isn’t a problem since Ignition, the tool that consumes the
+userdata, only runs on the first boot.
+
+You can provide a raw Ignition config (produced from a Container Linux
+Config) to Container Linux link:#via-the-microsoft-azure-cli[via the
+Microsoft Azure CLI].
+
+As an example, this config will configure and start etcd:
+
+```yaml container-linux-config:azure etcd: # All options get passed as
+command line flags to etcd. # Any information inside curly braces comes
+from the machine at boot time.
+
+multi_region and multi_cloud deployments need to use \{PUBLIC_IPV4}
+-------------------------------------------------------------------
+
+advertise_client_urls: ``http://\{PRIVATE_IPV4}:2379''
+initial_advertise_peer_urls: ``http://\{PRIVATE_IPV4}:2380'' # listen on
+both the official ports and the legacy ports # legacy ports can be
+omitted if your application doesn’t depend on them listen_client_urls:
+``http://0.0.0.0:2379'' listen_peer_urls:
+``http://\{PRIVATE_IPV4}:2380'' # generate a new token for each unique
+cluster from https://discovery.etcd.io/new?size=3 # specify the initial
+size of your cluster with ?size=X discovery:
+``https://discovery.etcd.io/'' ```
+
+Launching instances
+~~~~~~~~~~~~~~~~~~~
+
+Via the Microsoft Azure CLI
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Follow the
+https://docs.microsoft.com/en-us/cli/azure/overview[installation and
+configuration guides] for the Microsoft Azure CLI to set up your local
+installation.
+
+Instances on Microsoft Azure must be created within a resource group.
+Create a new resource group with the following command:
+
+[source,sh]
+----
+az group create --name group-1 --location <location>
+----
+
+Now that you have a resource group, create an instance of Container
+Linux Alpha inside it:
+
+[source,sh]
+----
+az vm create --name node-1 --resource-group group-1 --admin-username core --custom-data "$(cat config.ign)" --image CoreOS:CoreOS:Alpha:latest
+----
+
+Using CoreOS Container Linux
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Now that you have a machine booted it is time to play around. Check out
+the link:quickstart.md[Container Linux quickstart guide] or dig into
+https://coreos.com/docs[more specific topics].

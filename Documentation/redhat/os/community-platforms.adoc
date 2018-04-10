@@ -1,0 +1,35 @@
+Community supported platforms
+-----------------------------
+
+The Container Linux community has provided support for Container Linux
+on a number of platforms beyond those
+https://coreos.com/os/docs/latest/[officially supported] by CoreOS.
+
+The platforms and providers listed below each provide support and
+documentation for running Container Linux:
+
+Cloud providers
+~~~~~~~~~~~~~~~
+
+* link:booting-on-auro.md[AURO Cloud]
+* link:booting-on-brightbox.md[Brightbox Cloud]
+* link:booting-on-cloudca.md[cloud.ca]
+* link:booting-on-exoscale.md[Exoscale]
+* link:booting-on-ikoula.md[Ikoula]
+* link:booting-on-niftycloud.md[NIFTY Cloud]
+* link:booting-on-packet.md[Packet]
+* link:booting-on-rackspace.md[Rackspace Cloud]
+* link:booting-on-launchtimevps.md[RimuHosting LaunchtimeVPS]
+* link:booting-on-vexxhost.md[VEXXHOST Cloud]
+* link:booting-on-vultr.md[Vultr VPS]
+
+Other providers
+~~~~~~~~~~~~~~~
+
+* link:booting-on-cloudstack.md[CloudStack]
+* link:booting-on-eucalyptus.md[Eucalyptus]
+* link:booting-with-libvirt.md[libvirt]
+* link:booting-on-openstack.md[OpenStack]
+* link:booting-on-vagrant.md[Vagrant]
+* link:booting-on-virtualbox.md[VirtualBox]
+* link:booting-on-vmware.md[VMware]
